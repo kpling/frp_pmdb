@@ -2,6 +2,7 @@ aniso8601==7.0.0
 attrs==19.1.0
 Click==7.0
 Flask==1.1.1
+Flask-PyMongo==2.3.0
 flask-restplus==0.13.0
 itsdangerous==1.1.0
 Jinja2==2.10.1
