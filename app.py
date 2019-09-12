@@ -27,6 +27,8 @@ class PersonSchema(Schema):
 class Person(Resource):
     def post(self):
         person = PersonSchema().load(request.json)
+        if mongo.db.people.find_one({'name': person.get('name')}):
+            return {"error": "record already exists"}
         document = mongo.db.people.insert_one(person)
         return {"id": str(document.inserted_id)}
 
@@ -35,16 +37,13 @@ class Person(Resource):
 class Person(Resource):
     def get(self, name):
         document = mongo.db.people.find_one_or_404({"name": name})
-        person = PersonSchema().dump(document)
-        return person
+        return PersonSchema().dump(document)
 
     def put(self, name):
-        document = mongo.db.people.find_one({"name": name})
         person = PersonSchema().load(request.json)
-        document.save(person)
-        return person
+        document = mongo.db.people.update_one({"name": name}, {"$set": person})
+        return document.raw_result
 
     def delete(self, name):
-        document = mongo.db.people.find_one({"name": name})
-        mongo.db.people.remove(document)
-        return {}
+        document = mongo.db.people.find_one_or_404({"name": name})
+        return mongo.db.people.remove(document)
