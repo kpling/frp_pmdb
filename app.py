@@ -1,14 +1,12 @@
 from flask import Flask, request
 from flask_restplus import Api, Resource
 from marshmallow import Schema, fields, validate
-from pymongo import MongoClient
+from flask_pymongo import PyMongo
 
 app = Flask(__name__)
+app.config["MONGO_URI"] = "mongodb://localhost:27017/flask_app"
 api = Api(app)
-
-client = MongoClient()
-db = client.flask_app
-people = db.people
+mongo = PyMongo(app)
 
 
 class AddressSchema(Schema):
@@ -29,23 +27,24 @@ class PersonSchema(Schema):
 class Person(Resource):
     def post(self):
         person = PersonSchema().load(request.json)
-        document = people.insert_one(person)
+        document = mongo.db.people.insert_one(person)
         return {"id": str(document.inserted_id)}
 
 
 @api.route('/person/name/<string:name>')
 class Person(Resource):
     def get(self, name):
-        document = people.find_one({"name": name})
+        document = mongo.db.people.find_one_or_404({"name": name})
         person = PersonSchema().dump(document)
         return person
 
     def put(self, name):
-        document = people.find_one({"name": name})
+        document = mongo.db.people.find_one({"name": name})
         person = PersonSchema().load(request.json)
         document.save(person)
         return person
 
     def delete(self, name):
-        document = people.find_one({"name": name})
-        return people.remove(document)
+        document = mongo.db.people.find_one({"name": name})
+        mongo.db.people.remove(document)
+        return {}
