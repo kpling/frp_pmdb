@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_restplus import Api, Resource
 from flask_restplus import fields as model_fields  # workaround for presenting app in one module
@@ -7,7 +9,7 @@ from flask_pymongo import PyMongo
 
 app = Flask(__name__)
 api = Api(app, version='0.1', title='Person API', description='Example CRUD API using a Person model')
-app.config["MONGO_URI"] = "mongodb://localhost:27017/flask_app"
+app.config["MONGO_URI"] = os.getenv('MONGODB_URI', "mongodb://localhost:27017/flask_app")
 mongo = PyMongo(app)
 ns = api.namespace('person', description='Operations related to people')
 
