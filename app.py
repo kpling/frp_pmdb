@@ -7,6 +7,7 @@ app = Flask(__name__)
 api = Api(app, version='0.1', title='Person API', description='Example CRUD API using a Person model')
 app.config["MONGO_URI"] = "mongodb://localhost:27017/flask_app"
 mongo = PyMongo(app)
+ns = api.namespace('person', description='Operations related to people')
 
 
 class AddressSchema(Schema):
@@ -23,7 +24,7 @@ class PersonSchema(Schema):
     address = fields.Nested(AddressSchema())
 
 
-@api.route('/person')
+@ns.route('/')
 class Person(Resource):
     def post(self):
         person = PersonSchema().load(request.json)
@@ -33,8 +34,8 @@ class Person(Resource):
         return {"id": str(document.inserted_id)}
 
 
-@api.route('/person/name/<string:name>')
 class Person(Resource):
+@ns.route('/name/<string:name>')
     def get(self, name):
         document = mongo.db.people.find_one_or_404({"name": name})
         return PersonSchema().dump(document)
