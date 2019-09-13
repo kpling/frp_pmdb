@@ -27,3 +27,23 @@ https://frp-pymongo.herokuapp.com/
     }
 }
 ```
+
+## Deploy
+1. Create Heroku app
+```bash
+$ heroku create frp-pymongo
+$ heroku git:remote -a frp-pymongo
+$ heroku addons:create mongolab:sandbox
+```
+
+1. Set Environment Variables
+```bash
+$ heroku config:set FLASK_APP=app.py
+$ heroku config:set FLASK_ENV=production
+$ heroku config:set FLASK_DEBUG=0
+```
+
+1. Push code
+```bash
+$ git push heroku master
+```
