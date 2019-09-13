@@ -1,5 +1,6 @@
 from flask import Flask, request
 from flask_restplus import Api, Resource
+from flask_restplus import fields as model_fields  # workaround for presenting app in one module
 from marshmallow import Schema, fields, validate
 from flask_pymongo import PyMongo
 
@@ -8,6 +9,20 @@ api = Api(app, version='0.1', title='Person API', description='Example CRUD API 
 app.config["MONGO_URI"] = "mongodb://localhost:27017/flask_app"
 mongo = PyMongo(app)
 ns = api.namespace('person', description='Operations related to people')
+
+AddressModel = api.model('Address', {
+    'line_1': model_fields.String(max_length=256),
+    'line_2': model_fields.String(max_length=256),
+    'state': model_fields.String(max_length=2),
+    'zip': model_fields.String(pattern=r'\d{5}'),
+})
+
+PersonModel = api.model('Person', {
+    'name': model_fields.String(max_length=64),
+    'email': model_fields.String(pattern=r'[^@]+@[^@]+\.[^@]+'),
+    'phone': model_fields.String(pattern=r'\+?\d{10}'),
+    'address': model_fields.Nested(AddressModel),
+})
 
 
 class AddressSchema(Schema):
@@ -26,6 +41,7 @@ class PersonSchema(Schema):
 
 @ns.route('/')
 class Person(Resource):
+    @ns.expect(PersonModel)
     def post(self):
         person = PersonSchema().load(request.json)
         if mongo.db.people.find_one({'name': person.get('name')}):
@@ -40,6 +56,7 @@ class Person(Resource):
         document = mongo.db.people.find_one_or_404({"name": name})
         return PersonSchema().dump(document)
 
+    @ns.expect(PersonModel)
     def put(self, name):
         person = PersonSchema().load(request.json)
         document = mongo.db.people.update_one({"name": name}, {"$set": person})
