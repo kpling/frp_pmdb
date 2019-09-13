@@ -57,7 +57,6 @@ class Person(Resource):
 @ns.route('/name/<string:name>')
 class PersonNameDetail(Resource):
     def get(self, name):
-        document = mongo.db.people.find_one_or_404({"name": name})
         """Retrieve a person by name"""
 
         document = mongo.db.people.find_one({"name": name})
