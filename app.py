@@ -26,17 +26,17 @@ PersonModel = api.model('Person', {
 
 
 class AddressSchema(Schema):
-    line_1 = fields.Str(validate=validate.Length(max=256))
+    line_1 = fields.Str(required=True, validate=validate.Length(max=256))
     line_2 = fields.Str(validate=validate.Length(max=256))
-    state = fields.Str(validate=validate.Length(max=2))
-    zip = fields.Str(validate=validate.Regexp(r'\d{5}'))
+    state = fields.Str(required=True, validate=validate.Length(max=2))
+    zip = fields.Str(required=True, validate=validate.Regexp(r'\d{5}'))
 
 
 class PersonSchema(Schema):
-    name = fields.Str(validate=validate.Length(max=64))
-    email = fields.Email()
-    phone = fields.Str(validate=validate.Regexp(r'\+?\d{10}'))
-    address = fields.Nested(AddressSchema())
+    name = fields.Str(required=True, validate=validate.Length(max=64))
+    email = fields.Email(required=True)
+    phone = fields.Str(required=True, validate=validate.Regexp(r'\+?\d{10}'))
+    address = fields.Nested(AddressSchema(), required=True)
 
 
 @ns.route('/')
