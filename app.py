@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_restplus import Api, Resource
 from flask_restplus import fields as model_fields  # workaround for presenting app in one module
 from marshmallow import Schema, fields, validate
+from marshmallow.exceptions import ValidationError
 from flask_pymongo import PyMongo
 
 app = Flask(__name__)
@@ -65,6 +66,14 @@ class PersonNameDetail(Resource):
     @ns.expect(PersonModel)
     def put(self, name):
         person = PersonSchema().load(request.json)
+        """Update a person by name"""
+
+        try:
+            person = PersonSchema().load(api.payload)
+        except ValidationError as error:
+            return error.messages
+
+        # TODO: Handle no record exists
         document = mongo.db.people.update_one({"name": name}, {"$set": person})
         return document.raw_result
 
