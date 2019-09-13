@@ -78,5 +78,8 @@ class PersonNameDetail(Resource):
         return document.raw_result
 
     def delete(self, name):
-        document = mongo.db.people.find_one_or_404({"name": name})
+        """Delete a person by name"""
+
+        document = mongo.db.people.find_one({"name": name})
+        return mongo.db.people.remove(document)
         return mongo.db.people.remove(document)
