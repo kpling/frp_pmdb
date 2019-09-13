@@ -70,19 +70,20 @@ class PersonNameDetail(Resource):
         """Update a person by name"""
 
         try:
+            print(api.payload)
             person = PersonSchema().load(api.payload)
         except ValidationError as error:
             return error.messages
 
         # TODO: Handle no record exists
-        document = mongo.db.people.update_one({"name": name}, {"$set": person})
-        return document.raw_result
+        mongo.db.people.update_one({"name": name}, {"$set": person})
+        return {'modified': True}
 
     def delete(self, name):
         """Delete a person by name"""
 
-        document = mongo.db.people.find_one({"name": name})
-        return mongo.db.people.remove(document)
+        mongo.db.people.find_one({"name": name})
+        return {'deleted': True}
 
 
 @ns.route('/name/<string:phone>')
@@ -103,11 +104,11 @@ class PersonPhoneDetail(Resource):
             return error.messages
 
         # TODO: Handle no record exists
-        document = mongo.db.people.update_one({"phone": phone}, {"$set": person})
-        return document.raw_result
+        mongo.db.people.update_one({"phone": phone}, {"$set": person})
+        return {'modified': True}
 
     def delete(self, phone):
         """Delete a person by phone"""
 
-        document = mongo.db.people.find_one({"phone": phone})
-        return mongo.db.people.remove(document)
+        mongo.db.people.find_one({"phone": phone})
+        return {'deleted': True}
