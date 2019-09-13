@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask
 from flask_restplus import Api, Resource
 from flask_restplus import fields as model_fields  # workaround for presenting app in one module
 from marshmallow import Schema, fields, validate
@@ -65,7 +65,6 @@ class PersonNameDetail(Resource):
 
     @ns.expect(PersonModel)
     def put(self, name):
-        person = PersonSchema().load(request.json)
         """Update a person by name"""
 
         try:
