@@ -43,9 +43,12 @@ class PersonSchema(Schema):
 class Person(Resource):
     @ns.expect(PersonModel)
     def post(self):
-        person = PersonSchema().load(request.json)
-        if mongo.db.people.find_one({'name': person.get('name')}):
-            return {"error": "record already exists"}
+        """Create a person"""
+
+        try:
+            person = PersonSchema().load(api.payload)
+        except ValidationError as error:
+            return error.messages
         document = mongo.db.people.insert_one(person)
         return {"id": str(document.inserted_id)}
 
