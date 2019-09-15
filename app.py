@@ -12,17 +12,17 @@ ns = api.namespace('person', description='Operations related to people')
 collection = MongoClient(MONGO_URI).flask_app.person
 
 AddressModel = api.model('Address', {
-    'line_1': fields.String(max_length=256, example="1234 Main Street"),
-    'line_2': fields.String(max_length=256, example="Springfield"),
-    'state': fields.String(max_length=2, example="IL"),
-    'zip': fields.String(pattern=r'\d{5}', example="12345"),
+    'line_1': fields.String(required=True, max_length=256, example="1234 Main Street"),
+    'line_2': fields.String(required=True, max_length=256, example="Springfield"),
+    'state': fields.String(required=True, max_length=2, example="IL"),
+    'zip': fields.String(required=True, pattern=r'\d{5}', example="12345"),
 })
 
 PersonModel = api.model('Person', {
-    'name': fields.String(max_length=64, example='John Williams'),
-    'email': fields.String(pattern=r'[^@]+@[^@]+\.[^@]+', example='john.williams@email.com'),
-    'phone': fields.String(pattern=r'\+?\d{10}', example='1234567890'),
-    'address': fields.Nested(AddressModel),
+    'name': fields.String(required=True, max_length=64, example='John Williams'),
+    'email': fields.String(required=True, pattern=r'[^@]+@[^@]+\.[^@]+', example='john.williams@email.com'),
+    'phone': fields.String(required=True, pattern=r'\+?\d{10}', example='1234567890'),
+    'address': fields.Nested(AddressModel, required=True),
 })
 
 
