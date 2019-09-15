@@ -9,7 +9,7 @@ MONGO_URI = os.getenv('MONGODB_URI', "mongodb://localhost:27017/flask_app")
 
 api = Api(app, version='0.1', title='Person API', description='Example CRUD API using a Person model', validate=True)
 ns = api.namespace('person', description='Operations related to people')
-collection = MongoClient(MONGO_URI).person
+collection = MongoClient(MONGO_URI).frp_pmdb.person
 
 AddressModel = api.model('Address', {
     'line_1': fields.String(required=True, max_length=256, example="1234 Main Street"),
