@@ -13,17 +13,17 @@ ns = api.namespace('person', description='Operations related to people')
 mongo = PyMongo(app)
 
 AddressModel = api.model('Address', {
-    'line_1': model_fields.String(max_length=256),
-    'line_2': model_fields.String(max_length=256),
-    'state': model_fields.String(max_length=2),
-    'zip': model_fields.String(pattern=r'\d{5}'),
+    'line_1': fields.String(max_length=256, example="1234 Main Street"),
+    'line_2': fields.String(max_length=256, example="Springfield"),
+    'state': fields.String(max_length=2, example="IL"),
+    'zip': fields.String(pattern=r'\d{5}', example="12345"),
 })
 
 PersonModel = api.model('Person', {
-    'name': model_fields.String(max_length=64),
-    'email': model_fields.String(pattern=r'[^@]+@[^@]+\.[^@]+'),
-    'phone': model_fields.String(pattern=r'\+?\d{10}'),
-    'address': model_fields.Nested(AddressModel),
+    'name': fields.String(max_length=64, example='John Williams'),
+    'email': fields.String(pattern=r'[^@]+@[^@]+\.[^@]+', example='john.williams@email.com'),
+    'phone': fields.String(pattern=r'\+?\d{10}', example='1234567890'),
+    'address': fields.Nested(AddressModel),
 })
 
 
