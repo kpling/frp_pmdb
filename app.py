@@ -42,6 +42,7 @@ class Person(Resource):
         return {"id": str(document.inserted_id)}
 
 
+@ns.param('name', description="The name of the person being operated on.")
 @ns.route('/name/<string:name>')
 class PersonDetail(Resource):
     @api.marshal_with(PersonModel)
