@@ -2,15 +2,15 @@ import os
 
 from flask import Flask
 from flask_restplus import Api, Resource
-from flask_restplus import fields as model_fields  # workaround for presenting app in one module
-from flask_pymongo import PyMongo
+from flask_restplus import Api, Resource, fields
+from pymongo import MongoClient
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = os.getenv('MONGODB_URI', "mongodb://localhost:27017/flask_app")
+MONGO_URI = os.getenv('MONGODB_URI', "mongodb://localhost:27017")
 
 api = Api(app, version='0.1', title='Person API', description='Example CRUD API using a Person model')
 ns = api.namespace('person', description='Operations related to people')
-mongo = PyMongo(app)
+collection = MongoClient(MONGO_URI).flask_app.person
 
 AddressModel = api.model('Address', {
     'line_1': fields.String(max_length=256, example="1234 Main Street"),
@@ -29,10 +29,17 @@ PersonModel = api.model('Person', {
 
 @ns.route('/')
 class Person(Resource):
+    @ns.marshal_list_with(PersonModel)
+    def get(self):
+        """Retrieve all people"""
+
+        return list(collection.find())
+
     @ns.expect(PersonModel)
     def post(self):
         """Create a person"""
 
+        document = collection.insert_one(api.payload)
         return {"id": str(document.inserted_id)}
 
 
@@ -41,19 +48,17 @@ class PersonNameDetail(Resource):
     def get(self, name):
         """Retrieve a person by name"""
 
+        return collection.find_one({"name": name})
 
     @ns.expect(PersonModel)
     def put(self, name):
         """Update a person by name"""
 
-        mongo.db.people.update_one({"name": name}, {"$set": person})
-        return {'modified': True}
         result = collection.replace_one({"name": name}, api.payload, upsert=False)
+        return {'modified': f'{result.modified_count} record(s)'}
 
     def delete(self, name):
         """Delete a person by name"""
 
-        mongo.db.people.find_one({"name": name})
-        return {'deleted': True}
-
-
+        result = collection.delete_one({"name": name})
+        return {'deleted': f'{result.deleted_count} record(s)'}
