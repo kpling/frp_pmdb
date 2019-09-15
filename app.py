@@ -1,14 +1,13 @@
 import os
 
 from flask import Flask
-from flask_restplus import Api, Resource
 from flask_restplus import Api, Resource, fields
 from pymongo import MongoClient
 
 app = Flask(__name__)
 MONGO_URI = os.getenv('MONGODB_URI', "mongodb://localhost:27017")
 
-api = Api(app, version='0.1', title='Person API', description='Example CRUD API using a Person model')
+api = Api(app, version='0.1', title='Person API', description='Example CRUD API using a Person model', validate=True)
 ns = api.namespace('person', description='Operations related to people')
 collection = MongoClient(MONGO_URI).flask_app.person
 
@@ -44,7 +43,8 @@ class Person(Resource):
 
 
 @ns.route('/name/<string:name>')
-class PersonNameDetail(Resource):
+class PersonDetail(Resource):
+    @api.marshal_with(PersonModel)
     def get(self, name):
         """Retrieve a person by name"""
 
