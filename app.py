@@ -3,8 +3,6 @@ import os
 from flask import Flask
 from flask_restplus import Api, Resource
 from flask_restplus import fields as model_fields  # workaround for presenting app in one module
-from marshmallow import Schema, fields, validate
-from marshmallow.exceptions import ValidationError
 from flask_pymongo import PyMongo
 
 app = Flask(__name__)
@@ -29,31 +27,12 @@ PersonModel = api.model('Person', {
 })
 
 
-class AddressSchema(Schema):
-    line_1 = fields.Str(required=True, validate=validate.Length(max=256))
-    line_2 = fields.Str(validate=validate.Length(max=256))
-    state = fields.Str(required=True, validate=validate.Length(max=2))
-    zip = fields.Str(required=True, validate=validate.Regexp(r'\d{5}'))
-
-
-class PersonSchema(Schema):
-    name = fields.Str(required=True, validate=validate.Length(max=64))
-    email = fields.Email(required=True)
-    phone = fields.Str(required=True, validate=validate.Regexp(r'\+?\d{10}'))
-    address = fields.Nested(AddressSchema(), required=True)
-
-
 @ns.route('/')
 class Person(Resource):
     @ns.expect(PersonModel)
     def post(self):
         """Create a person"""
 
-        try:
-            person = PersonSchema().load(api.payload)
-        except ValidationError as error:
-            return error.messages
-        document = mongo.db.people.insert_one(person)
         return {"id": str(document.inserted_id)}
 
 
@@ -62,22 +41,14 @@ class PersonNameDetail(Resource):
     def get(self, name):
         """Retrieve a person by name"""
 
-        document = mongo.db.people.find_one({"name": name})
-        return PersonSchema().dump(document)
 
     @ns.expect(PersonModel)
     def put(self, name):
         """Update a person by name"""
 
-        try:
-            print(api.payload)
-            person = PersonSchema().load(api.payload)
-        except ValidationError as error:
-            return error.messages
-
-        # TODO: Handle no record exists
         mongo.db.people.update_one({"name": name}, {"$set": person})
         return {'modified': True}
+        result = collection.replace_one({"name": name}, api.payload, upsert=False)
 
     def delete(self, name):
         """Delete a person by name"""
