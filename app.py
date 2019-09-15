@@ -5,11 +5,11 @@ from flask_restplus import Api, Resource, fields
 from pymongo import MongoClient
 
 app = Flask(__name__)
-MONGO_URI = os.getenv('MONGODB_URI', "mongodb://localhost:27017")
+MONGO_URI = os.getenv('MONGODB_URI', "mongodb://localhost:27017/flask_app")
 
 api = Api(app, version='0.1', title='Person API', description='Example CRUD API using a Person model', validate=True)
 ns = api.namespace('person', description='Operations related to people')
-collection = MongoClient(MONGO_URI).flask_app.person
+collection = MongoClient(MONGO_URI).person
 
 AddressModel = api.model('Address', {
     'line_1': fields.String(required=True, max_length=256, example="1234 Main Street"),
