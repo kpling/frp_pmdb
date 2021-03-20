@@ -6,7 +6,7 @@ Flask-PyMongo==2.3.0
 flask-restplus==0.13.0
 gunicorn==19.9.0
 itsdangerous==1.1.0
-Jinja2==2.10.1
+Jinja2==2.11.3
 jsonschema==3.0.2
 MarkupSafe==1.1.1
 marshmallow==3.0.4
